@@ -1,0 +1,13 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+/.idea
+/src/corpus txt
+/.DS_Store
+src/.DS_Store
+src/rating-scraper/.DS_Store
