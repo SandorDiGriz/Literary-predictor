@@ -9,9 +9,6 @@ import csv
 
 
 class Scraper:
-    def __init__(self):
-        "Class implements some functions to scrape user evaluation of texts from 'LitRes'"
-
     def get_files(self):
         """get files from corpus"""
         # Changing directory to corpus location
@@ -128,3 +125,4 @@ class Scraper:
 
 
 sc = Scraper()
+# print(sc.get_mark("Война и мир"))
