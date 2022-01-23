@@ -1,7 +1,9 @@
 """File that defines the scraper to parse books' rating from 'lirtes.ru'"""
 
-import requests
+
 from bs4 import BeautifulSoup
+
+import requests
 import os
 import csv
 
@@ -57,7 +59,7 @@ class Scraper:
 
     def scrape_marks(self):
         """write parsed data to csv-file"""
-        with open("marks.csv", "w", newline="") as mark_file:
+        with open("marks.csv", "a", newline="") as mark_file:
             writer = csv.writer(mark_file, quotechar='"')
             for book_name in self.get_files():
                 # Tracing the book to be parsed
@@ -79,33 +81,50 @@ class Scraper:
         # Changing directory to scraper location
         if not "/rating-scraper" in os.path.abspath(os.curdir):
             os.chdir(os.path.abspath("rating-scraper"))
-            with open("evaluated_texts.csv", "w", newline="") as eval_file:
-                with open("marks.csv", "r", newline="") as mark_file:
-                    reader = csv.reader(mark_file, quotechar='"')
-                    writer = csv.writer(eval_file, quotechar='"')
-                    for row in reader:
-                        if not "Not found" in row:
-                            print(",".join(row))
-                            writer.writerow(row)
+        with open("evaluated_texts.csv", "a", newline="") as eval_file:
+            with open("marks.csv", "a+", newline="") as mark_file:
+                reader = csv.reader(mark_file, quotechar='"')
+                writer = csv.writer(eval_file, quotechar='"')
+                for row in reader:
+                    if not "Not found" in row:
+                        print(",".join(row))
+                        writer.writerow(row)
 
     def check_marked(self):
         if not "/rating-scraper" in os.path.abspath(os.curdir):
             os.chdir(os.path.abspath("src/rating-scraper"))
-            with open("evaluated_texts.csv", "r", newline="") as eval_file:
-                reader = csv.reader(eval_file, quotechar='"')
-                counter = 0
-                suspicion_lst = []
-                for row in reader:
-                    counter += 1
-                    if self.get_mark(row[0]) != "COULD BE AN ERROR":
-                        continue
-                    else:
-                        row.insert(0, counter)
-                        row = [str(i) for i in row]
-                        suspicion_lst.append(" ".join(row))
+        with open("evaluated_texts.csv", "a+", newline="") as eval_file:
+            reader = csv.reader(eval_file, quotechar='"')
+            suspicion_lst = []
+            for row in reader:
+                if self.get_mark(row[0]) != "COULD BE AN ERROR":
+                    continue
+                else:
+                    row = [str(i) for i in row]
+                    suspicion_lst.append(" ".join(row))
 
         return suspicion_lst
 
+    def find_path(self):
+        if not "/rating-scraper" in os.path.abspath(os.curdir):
+            os.chdir(os.path.abspath("src/rating-scraper"))
+        with open("evaluated_texts.csv", "r", newline="") as file:
+            reader = csv.reader(file, quotechar='"')
+            counter = 0
+            list_of_files = []
+            csv_path = []
+            for row in reader:
+                for current_file in sorted(self.get_files()):
+                    if row[0] in current_file:
+                        if current_file in list_of_files:
+                            continue
+                        counter += 1
+                        list_of_files.append(current_file)
+                        row.append(os.path.abspath(current_file))
+                        csv_path.append(row)
+                        break
+
+        return csv_path
+
 
 sc = Scraper()
-print(sc.get_mark("Из евреев в попаданцы"))
