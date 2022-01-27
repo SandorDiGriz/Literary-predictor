@@ -7,6 +7,7 @@ import numpy as np
 import re
 import math
 import random
+import csv
 
 
 class Extractor:
@@ -71,32 +72,34 @@ class Extractor:
 
         return (char_distfreq[str(char)] * 1000) / char_distfreq.N()
 
-    def lexical_complexity(
-        self, text, stopwords=nltk.corpus.stopwords.words("russian")
-    ):
+    def lexical_complexity(self, text):
         tokens = self.tokenize("".join(text))
-        lemmas = []
-        counter = 0
-        pbar = tqdm(total=1000)
-
+        lex_level = []
         with open(
-            "/Users/apotekhin/repositories/literary-predictor/src/feature-extractor/simple lex.txt",
+            "/Users/apotekhin/repositories/literary-predictor/src/feature-extractor/vocab by level.csv",
             "r",
             encoding="utf-8",
         ) as file:
-            simple_lex = file.readlines()[0].split()
-            while len(lemmas) < 1000:
-                sample_token = self.lemmatize_word(random.choice(tokens))
-                lemma = sample_token if not sample_token in stopwords else []
+            dict = file.readlines()
+            sample_tokens = self.lemmatize_text(random.choices(tokens, k=1000))
 
-                if lemma:
-                    pbar.update(1)
-                    lemmas.append("".join(lemma))
-                    if lemma in simple_lex:
-                        counter += 1
-            pbar.close()
+            for lemma in sample_tokens:
+                for line in dict:
+                    values = line.split(",")
+                    if lemma == values[0]:
+                        lex_level.append(values[1].split("\n")[0])
 
-            return counter / 1000
+            voc_percentage = {
+                "A1": round(lex_level.count("1E") / 1000, 2),
+                "A2": round(lex_level.count("2I") / 1000, 2),
+                "B1": round(lex_level.count("3A") / 1000, 2),
+                "B2": round(lex_level.count("3AU") / 1000, 2),
+                "C1": round(lex_level.count("4S") / 1000, 2),
+                "C2": round(lex_level.count("4SU") / 1000, 2),
+                "unknown": round(1000 - len(lex_level) / 1000, 2),
+            }
+
+            return voc_percentage
 
     def ttr(self, text, mode="standard", lemmatize=False):
         tokens = self.tokenize("".join(text))
@@ -120,55 +123,69 @@ class Extractor:
                 f"Current mode is '{mode}' but should be in ('standard', 'root', 'corrected')"
             )
 
-    def readability_score_oborneva(self, text, func="fre"):
+    def readability_score_oborneva(self, text, method="fre"):
         syllables = len(
             re.findall("[АаУуОоЫыИиЭэЯяЮюЁёЕеAaEeIiOoUuYy]", " ".join(text))
         )
         words = len(self.tokenize("".join(text)))
         sentences = len(nltk.sent_tokenize("".join(text)))
-        if func == "fre":
+        if method == "fre":
             return 206.835 - 1.3 * (words / sentences) - 60.1 * (syllables / words)
-        elif func == "fkd":
+        elif method == "fkd":
             return (0.5 * words / sentences) + (8.4 * syllables / words) - 15.59
         else:
             raise ValueError(
-                f"Current function is '{func}' but should be in ('fre', 'fkd')"
+                f"Current method is '{method}' but should be in ('fre', 'fkd')"
             )
 
-    def readability_score_soloviev(self, text, func="fre"):
+    def readability_score_soloviev(self, text, method="fre"):
         syllables = len(
             re.findall("[АаУуОоЫыИиЭэЯяЮюЁёЕеAaEeIiOoUuYy]", " ".join(text))
         )
         words = len(self.tokenize("".join(text)))
         sentences = len(nltk.sent_tokenize("".join(text)))
-        if func == "fre":
+        if method == "fre":
             return 208.7 - 2.6 * (words / sentences) - 39.2 * (syllables / words)
-        elif func == "fkd":
+        elif method == "fkd":
             return (0.36 * words / sentences) + (5.76 * syllables / words) - 11.97
         else:
             raise ValueError(
-                f"Current function is '{func}' but should be in ('fre', 'fkd')"
+                f"Current method is '{method}' but should be in ('fre', 'fkd')"
             )
 
-    def extract_all(self, text):
-        print("avg_word_len -- ", self.avg_word_len(text))
-        print("avg_sent_len -- ", self.avg_sent_len(text))
-        print("avg_words_per_par -- ", self.avg_words_per_prg(text))
+    def extract_all(self, text, cut_edge=False):
+        lex_complx = self.lexical_complexity(text)
+        methods = {
+            "avg_word_len": self.avg_word_len(text),
+            "avg_sent_len": self.avg_sent_len(text),
+            "avg_words_per_par": self.avg_words_per_prg(text),
+            "comma_freq": self.char_freq(text, ","),
+            "colon_freq": self.char_freq(text, ":"),
+            "A1 voc": lex_complx.get("A1"),
+            "A2 voc": lex_complx.get("A2"),
+            "B1 voc": lex_complx.get("B1"),
+            "B2 voc": lex_complx.get("B2"),
+            "C1 voc": lex_complx.get("C1"),
+            "C2 voc": lex_complx.get("C2"),
+            "unknown voc": lex_complx.get("unknown"),
+            "ttr": self.ttr(text),
+            "ttr-root": self.ttr(text, "root"),
+            "ttr-log": self.ttr(text, "log"),
+            "ttr-corrected": self.ttr(text, "corrected"),
+            "FKD-oborneva": self.readability_score_oborneva(text, "fkd"),
+            "FRE-oborneva": self.readability_score_oborneva(text, "fre"),
+            "FKD-soloviev": self.readability_score_soloviev(text, "fkd"),
+            "FRE-soloviev": self.readability_score_soloviev(text, "fre"),
+        }
 
-        print("char_freq -- ", self.char_freq(text, ","))
-        print("lxcp -- ", self.lexical_complexity(text))
-        print("ttr -- ", self.ttr(text))
-
-        print(
-            "readability_score_oborneva -- ",
-            self.readability_score_oborneva(text, "fkd"),
-        )
-        print("readability_score_soloviev -- ", self.readability_score_soloviev(text))
+        return methods
 
 
 et = Extractor()
 et_t = et.get_text(
-    "/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Временщик. Вратарь (СИ) - Дмитрий Билик.txt"
+    "/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Далёкие миры 2 [СИ] - Алексей Скляренко.txt"
 )
-print(et.extract_all(et_t))
-#  dont forget to cut the edges
+et_all = et.extract_all(et_t)
+for i in et_all:
+    print(i, et_all[i])
+# cut edg
