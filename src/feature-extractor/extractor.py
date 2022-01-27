@@ -72,11 +72,11 @@ class Extractor:
 
         return (char_distfreq[str(char)] * 1000) / char_distfreq.N()
 
-    def lexical_complexity(self, text):
+    def lexical_complexity(self, text, path="src/feature-extractor/vocab by level.csv"):
         tokens = self.tokenize("".join(text))
         lex_level = []
         with open(
-            "/Users/apotekhin/repositories/literary-predictor/src/feature-extractor/vocab by level.csv",
+            path,
             "r",
             encoding="utf-8",
         ) as file:
@@ -96,7 +96,7 @@ class Extractor:
                 "B2": round(lex_level.count("3AU") / 1000, 2),
                 "C1": round(lex_level.count("4S") / 1000, 2),
                 "C2": round(lex_level.count("4SU") / 1000, 2),
-                "unknown": round(1000 - len(lex_level) / 1000, 2),
+                "unknown": round((1000 - len(lex_level)) / 1000, 2),
             }
 
             return voc_percentage
@@ -156,9 +156,9 @@ class Extractor:
     def extract_all(self, text, cut_edge=False):
         lex_complx = self.lexical_complexity(text)
         methods = {
-            "avg_word_len": self.avg_word_len(text),
-            "avg_sent_len": self.avg_sent_len(text),
-            "avg_words_per_par": self.avg_words_per_prg(text),
+            "avg_word_len": self.avg_word_len(text, cut_edge),
+            "avg_sent_len": self.avg_sent_len(text, cut_edge),
+            "avg_words_per_par": self.avg_words_per_prg(text, cut_edge),
             "comma_freq": self.char_freq(text, ","),
             "colon_freq": self.char_freq(text, ":"),
             "A1 voc": lex_complx.get("A1"),
@@ -182,10 +182,8 @@ class Extractor:
 
 
 et = Extractor()
-et_t = et.get_text(
-    "/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Далёкие миры 2 [СИ] - Алексей Скляренко.txt"
-)
+et_t = et.get_text("src/corpus txt/Война и мир. Книга 1 - Лев Николаевич Толстой.txt")
 et_all = et.extract_all(et_t)
 for i in et_all:
     print(i, et_all[i])
-# cut edg
+# # cut edg
