@@ -1,6 +1,7 @@
 from pymorphy2 import MorphAnalyzer
 from functools import lru_cache
 from tqdm import tqdm
+from lexical_diversity import lex_div as ld
 
 import nltk
 import numpy as np
@@ -50,16 +51,22 @@ class Extractor:
 
         return np.mean(sent_len)
 
-    def avg_word_len(self, text, cut_edge=False):
-        tokens = self.tokenize("".join(text))  # set?
+    def avg_word_len(self, text, tokenize=True, cut_edge=False):
+        if tokenize:
+            tokens = self.tokenize("".join(text))
+        else:
+            tokens = text
         word_len = [len(token) for token in tokens]
         if len(word_len) > 500 and cut_edge:
             word_len = word_len[500:]
 
         return np.mean(word_len)
 
-    def avg_words_per_prg(self, text, cut_edge=False):
-        tokens = self.tokenize("".join(text))
+    def avg_words_per_prg(self, text, tokenize=True, cut_edge=False):
+        if tokenize:
+            tokens = self.tokenize("".join(text))
+        else:
+            tokens = text
         paragraphs = list(filter(lambda x: x != "", "".join(text).split("\n\n")))
         if len(paragraphs) > 100 and cut_edge:
             paragraphs = paragraphs[100:]
@@ -72,8 +79,13 @@ class Extractor:
 
         return (char_distfreq[str(char)] * 1000) / char_distfreq.N()
 
-    def lexical_complexity(self, text, path="src/feature-extractor/vocab by level.csv"):
-        tokens = self.tokenize("".join(text))
+    def lexical_complexity(
+        self, text, path="src/feature-extractor/vocab by level.csv", tokenize=True
+    ):
+        if tokenize:
+            tokens = self.tokenize("".join(text))
+        else:
+            tokens = text
         lex_level = []
         with open(
             path,
@@ -101,9 +113,11 @@ class Extractor:
 
             return voc_percentage
 
-    def ttr(self, text, mode="standard", lemmatize=False):
-        tokens = self.tokenize("".join(text))
-        # not lemmas ((
+    def ttr(self, text, mode="standard", tokenize=True, lemmatize=False):
+        if tokenize:
+            tokens = self.tokenize("".join(text))
+        else:
+            tokens = text
         if lemmatize:
             tokens = self.lemmatize_text(tokens)
         if mode == "standard":
@@ -117,6 +131,12 @@ class Extractor:
 
         elif mode == "log":
             return math.log10(len(set(tokens))) / math.log10(len(tokens))
+
+        elif mode == "hdd":
+            return ld.hdd(tokens)
+
+        elif mode == "mtld":
+            return ld.mtld(tokens)
 
         else:
             raise ValueError(
@@ -156,11 +176,12 @@ class Extractor:
     def extract_all(self, text, cut_edge=False):
         lex_complx = self.lexical_complexity(text)
         methods = {
-            "avg_word_len": self.avg_word_len(text, cut_edge),
+            "avg_word_len": self.avg_word_len(text, cut_edge, tokenize=True),
             "avg_sent_len": self.avg_sent_len(text, cut_edge),
-            "avg_words_per_par": self.avg_words_per_prg(text, cut_edge),
+            "avg_words_per_par": self.avg_words_per_prg(text, cut_edge, tokenize=True),
             "comma_freq": self.char_freq(text, ","),
             "colon_freq": self.char_freq(text, ":"),
+            "dash_freq": self.char_freq(text, "—"),
             "A1 voc": lex_complx.get("A1"),
             "A2 voc": lex_complx.get("A2"),
             "B1 voc": lex_complx.get("B1"),
@@ -168,10 +189,12 @@ class Extractor:
             "C1 voc": lex_complx.get("C1"),
             "C2 voc": lex_complx.get("C2"),
             "unknown voc": lex_complx.get("unknown"),
-            "ttr": self.ttr(text),
-            "ttr-root": self.ttr(text, "root"),
-            "ttr-log": self.ttr(text, "log"),
-            "ttr-corrected": self.ttr(text, "corrected"),
+            "TTR": self.ttr(text),
+            "TTR-root": self.ttr(text, "root"),
+            "TTR-log": self.ttr(text, "log"),
+            "TTR-corrected": self.ttr(text, "corrected"),
+            "TTR-hdd": self.ttr(text, "hdd"),
+            "TTR-mtld": self.ttr(text, "mtld"),
             "FKD-oborneva": self.readability_score_oborneva(text, "fkd"),
             "FRE-oborneva": self.readability_score_oborneva(text, "fre"),
             "FKD-soloviev": self.readability_score_soloviev(text, "fkd"),
@@ -182,8 +205,11 @@ class Extractor:
 
 
 et = Extractor()
-et_t = et.get_text("src/corpus txt/Война и мир. Книга 1 - Лев Николаевич Толстой.txt")
+et_t = et.get_text(
+    "src/corpus txt/Человек для особых поручений - Антон В. Демченко.txt"
+)
 et_all = et.extract_all(et_t)
 for i in et_all:
     print(i, et_all[i])
-# # cut edg
+
+# cut edge
