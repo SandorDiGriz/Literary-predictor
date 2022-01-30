@@ -1,7 +1,10 @@
+"""File contents an extractor of linguistic features from the text"""
+
 from pymorphy2 import MorphAnalyzer
 from functools import lru_cache
 from tqdm import tqdm
 from lexical_diversity import lex_div as ld
+from typing import List
 
 import nltk
 import numpy as np
@@ -12,38 +15,81 @@ import csv
 
 
 class Extractor:
-    def get_text(self, path):
+    """Class implements multiple functions to get various text parameters"""
+
+    def get_text(self, path: str) -> List[str]:
+        """
+        Reads the text from the file by path
+
+        Parameters
+        ----------
+            path (str): abs or relative path to the directory with a file
+
+        Returns
+        -------
+            List[str]: list of text splitted by lines
+        """
+
         with open(path, "r", encoding="utf-8") as file:
             text = file.readlines()
 
         return text
 
-    def tokenize(self, text, regex="[А-Яа-яёA-z]+"):
+    def tokenize(self, text: str or List[str], regex="[А-Яа-яёA-z]+") -> List[str]:
+        """
+        Splits the text into tokens
+
+        Parameters
+        ----------
+            text (str or list): string or list with strings
+            regex (str, optional): regular expression to devide the text. Defaults to "[А-Яа-яёA-z]+".
+
+        Returns
+        -------
+            List[str]: list of tokens
+        """
         regex = re.compile(regex)
         tokens = regex.findall(text.lower())
 
         return tokens
 
     def remove_stopwords(
-        self, lemmas, stopwords=nltk.corpus.stopwords.words("russian")
-    ):
+        self, lemmas: List[str], stopwords=nltk.corpus.stopwords.words("russian")
+    ) -> List[str]:
+        """Returns list of lemmas without stopwords"""
         return [w for w in lemmas if not w in stopwords and len(w) > 3]
 
     @lru_cache(maxsize=128)
-    def lemmatize_word(self, token):
+    def lemmatize_word(self, token: str) -> str:
+        """Returns lemma"""
         pymorphy = MorphAnalyzer()
         return pymorphy.parse(token)[0].normal_form
 
-    def lemmatize_text(self, text):
+    def lemmatize_text(self, text: List[str]) -> List[str]:
+        """Returns list of lemmas"""
         return [self.lemmatize_word(w) for w in tqdm(text)]
 
-    def clean_text(self, text):
+    def clean_text(self, text: str or List[str]) -> List[str]:
+        """Returns list of lemmas without stopwords"""
         tokens = self.tokenize("".join(text))
         lemmas = self.lemmatize_text(tokens)
 
         return self.remove_stopwords(lemmas)
 
-    def avg_sent_len(self, text, cut_edge=False):
+    def avg_sent_len(self, text: str or List[str], cut_edge=False) -> float:
+        """
+        Calculates the average length of a text sentence
+
+        Parameters
+        ----------
+            text (str or  List[str]): input text
+            cut_edge (bool, optional): arg to cut the beginning of the text (annotation, index etc). Defaults to False.
+
+        Returns
+        -------
+            float: average length of a sentence
+        """
+
         sentences = nltk.sent_tokenize("".join(text))
         sent_len = [len(self.tokenize(sent)) for sent in sentences]
         if len(sent_len) > 20 and cut_edge:
@@ -51,7 +97,22 @@ class Extractor:
 
         return np.mean(sent_len)
 
-    def avg_word_len(self, text, tokenize=True, cut_edge=False):
+    def avg_word_len(
+        self, text: str or List[str], tokenize=True, cut_edge=False
+    ) -> float:
+        """
+        Calculates the average length of a word in the text
+
+        Parameters
+        ----------
+            text (str or  List[str]): input text
+            tokenize (bool, optional): if input text should be tokenized first. Defaults to True.
+            cut_edge (bool, optional): arg to cut the beginning of the text (annotation, index etc). Defaults to False.
+
+        Returns
+        -------
+            float: average length of a word
+        """
         if tokenize:
             tokens = self.tokenize("".join(text))
         else:
@@ -62,7 +123,21 @@ class Extractor:
 
         return np.mean(word_len)
 
-    def avg_words_per_prg(self, text, tokenize=True, cut_edge=False):
+    def avg_words_per_prg(self, text: str or List[str], tokenize=True, cut_edge=False):
+        """
+        Calculates the average number of words per paragraph
+
+        Parameters
+        ----------
+            text (str or  List[str]): input text
+            tokenize (bool, optional): if input text should be tokenized first. Defaults to True.
+            cut_edge (bool, optional): arg to cut the beginning of the text (annotation, index etc). Defaults to False.
+
+        Returns
+        -------
+            float: average number of words per paragraph
+        """
+
         if tokenize:
             tokens = self.tokenize("".join(text))
         else:
@@ -73,15 +148,39 @@ class Extractor:
 
         return len(tokens) / len(paragraphs)
 
-    def char_freq(self, text, char):
+    def char_freq(self, text: str or List[str], char: str) -> float:
+        """
+        Calculates the frequency of a given character
+
+        Parameters
+        ----------
+            text (str or List[str]): input text
+            char (str): input character
+
+        Returns
+        -------
+            float: character frequency per thousand
+        """
         tokens = nltk.word_tokenize("".join(text))
         char_distfreq = nltk.probability.FreqDist(tokens)
 
         return (char_distfreq[str(char)] * 1000) / char_distfreq.N()
 
-    def lexical_complexity(
-        self, text, path="src/feature-extractor/vocab by level.csv", tokenize=True
-    ):
+    def lexical_complexity(self, text, path="./vocab by level.csv", tokenize=True):
+        """
+        Сalculates the ratio of vocabulary levels per random thousand words
+
+        Parameters
+        ----------
+            text (str or List[str]): input text
+            path (str, optional): path to the dictionary. Defaults to "src/feature-extractor/vocab by level.csv".
+            tokenize (bool, optional): if input text should be tokenized first. Defaults to True.
+
+        Returns
+        -------
+            dict: dictionary with the ratio of language levels
+        """
+
         if tokenize:
             tokens = self.tokenize("".join(text))
         else:
@@ -113,7 +212,27 @@ class Extractor:
 
             return voc_percentage
 
-    def ttr(self, text, mode="standard", tokenize=True, lemmatize=False):
+    def ttr(
+        self, text: str or List[str], mode="standard", tokenize=True, lemmatize=False
+    ) -> float:
+        """
+        Calculates type-token ratio.
+
+        Parameters
+        ----------
+            text (strorList[str]): input text
+            mode (str, optional): modification of TTR calculation. Defaults to "standard".
+            tokenize (bool, optional): if input text should be tokenized first. Defaults to True.
+            lemmatize (bool, optional): if input text should be lemmatized. Defaults to False.
+
+        Raises
+        ------
+            ValueError: input mode parameter is unknown
+
+        Returns
+        -------
+            float: type-token ratio
+        """
         if tokenize:
             tokens = self.tokenize("".join(text))
         else:
@@ -144,6 +263,23 @@ class Extractor:
             )
 
     def readability_score_oborneva(self, text, method="fre"):
+        """
+        Calculates readability score based on Flesch reading ease scale and Flesch-Kincaid Grade Level.
+        Corrected by Irina Oborneva
+
+        Parameters
+        ----------
+            text (str or List[str]): input text
+            method (str, optional): FRE or FKD(L). Defaults to "fre".
+
+        Raises
+        ------
+            ValueError: input method parameter is unknown
+
+        Returns
+        -------
+            float: readability score
+        """
         syllables = len(
             re.findall("[АаУуОоЫыИиЭэЯяЮюЁёЕеAaEeIiOoUuYy]", " ".join(text))
         )
@@ -159,6 +295,23 @@ class Extractor:
             )
 
     def readability_score_soloviev(self, text, method="fre"):
+        """
+        Calculates readability score based on Flesch reading ease scale and Flesch-Kincaid Grade Level.
+        Corrected by Valery Solovyev
+
+        Parameters
+        ----------
+            text (str or List[str]): input text
+            method (str, optional): FRE or FKD(L). Defaults to "fre".
+
+        Raises
+        ------
+            ValueError: input method parameter is unknown
+
+        Returns
+        -------
+            float: readability score
+        """
         syllables = len(
             re.findall("[АаУуОоЫыИиЭэЯяЮюЁёЕеAaEeIiOoUuYy]", " ".join(text))
         )
@@ -173,12 +326,15 @@ class Extractor:
                 f"Current method is '{method}' but should be in ('fre', 'fkd')"
             )
 
-    def extract_all(self, text, cut_edge=False):
+    def extract_all(self, text: str or List[str], cut_edge=False) -> dict:
+        """Gets all text features"""
         lex_complx = self.lexical_complexity(text)
         methods = {
-            "avg_word_len": self.avg_word_len(text, cut_edge, tokenize=True),
-            "avg_sent_len": self.avg_sent_len(text, cut_edge),
-            "avg_words_per_par": self.avg_words_per_prg(text, cut_edge, tokenize=True),
+            "avg_word_len": self.avg_word_len(text, cut_edge=cut_edge, tokenize=True),
+            "avg_sent_len": self.avg_sent_len(text, cut_edge=cut_edge),
+            "avg_words_per_par": self.avg_words_per_prg(
+                text, cut_edge=cut_edge, tokenize=True
+            ),
             "comma_freq": self.char_freq(text, ","),
             "colon_freq": self.char_freq(text, ":"),
             "dash_freq": self.char_freq(text, "—"),
@@ -204,12 +360,10 @@ class Extractor:
         return methods
 
 
-et = Extractor()
-et_t = et.get_text(
-    "src/corpus txt/Человек для особых поручений - Антон В. Демченко.txt"
-)
-et_all = et.extract_all(et_t)
-for i in et_all:
-    print(i, et_all[i])
-
-# cut edge
+# et = Extractor()
+# et_t = et.get_text(
+#     "src/corpus txt/Человек для особых поручений - Антон В. Демченко.txt"
+# )
+# et_all = et.extract_all(et_t)
+# for i in et_all:
+#     print(i, et_all[i])

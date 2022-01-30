@@ -10,7 +10,7 @@ import csv
 
 class Scraper:
     def get_files(self):
-        """get files from corpus"""
+        """Get files from corpus"""
         # Changing directory to corpus location
         if "/rating-scraper" in os.path.abspath(os.curdir):
             os.chdir("..")
@@ -18,7 +18,7 @@ class Scraper:
         return list_of_files
 
     def get_mark(self, book_name):
-        """get marks of a book from 'litres'"""
+        """Get marks of a book from 'litres'"""
         search_url = "https://www.litres.ru/pages/rmd_search_arts/?q=" + book_name
         search_response = requests.get(search_url)
         soup = BeautifulSoup(search_response.text, "lxml")
@@ -55,7 +55,7 @@ class Scraper:
         )
 
     def scrape_marks(self):
-        """write parsed data to csv-file"""
+        """Write parsed data to csv-file"""
         with open("marks.csv", "a", newline="") as mark_file:
             writer = csv.writer(mark_file, quotechar='"')
             for book_name in self.get_files():
@@ -74,7 +74,7 @@ class Scraper:
                 )
 
     def filter_marks():
-        """cut unknown books"""
+        """Cut unknown books"""
         # Changing directory to scraper location
         if not "/rating-scraper" in os.path.abspath(os.curdir):
             os.chdir(os.path.abspath("rating-scraper"))
@@ -87,7 +87,8 @@ class Scraper:
                         print(",".join(row))
                         writer.writerow(row)
 
-    def check_marked(self):
+    def check_marked(self) -> list:
+        """Checks for possible parser errors"""
         if not "/rating-scraper" in os.path.abspath(os.curdir):
             os.chdir(os.path.abspath("src/rating-scraper"))
         with open("evaluated_texts.csv", "a+", newline="") as eval_file:
@@ -102,7 +103,8 @@ class Scraper:
 
         return suspicion_lst
 
-    def find_path(self):
+    def find_path(self) -> str:
+        """Gets the path to the file"""
         if not "/rating-scraper" in os.path.abspath(os.curdir):
             os.chdir(os.path.abspath("src/rating-scraper"))
         with open("evaluated_texts.csv", "r", newline="") as file:
