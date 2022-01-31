@@ -13,3 +13,8 @@ src/.DS_Store
 src/rating-scraper/.DS_Store
 src/feature-extractor/.DS_Store
 src/feature-extractor/__pycache__/extractor.cpython-39.pyc
+src/rating-predictor/catboost_info/catboost_training.json
+src/rating-predictor/catboost_info/time_left.tsv
+src/rating-predictor/catboost_info/learn_error.tsv
+src/rating-predictor/catboost_info/learn/events.out.tfevents
+src/rating-predictor/1

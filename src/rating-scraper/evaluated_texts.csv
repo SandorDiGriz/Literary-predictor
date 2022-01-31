@@ -176,7 +176,7 @@ index,title,author,litres mark,litres votes,livelib mark,livelib votes,path
 174,Ярость бога, Дем Михайлов,4.0,108,3.8,51,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Ярость бога - Дем Михайлов.txt
 175,Противостояние. Обретение мечты, Александр Валерьевич Тарасов,4.3,45,None,None,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Противостояние. Обретение мечты - Александр Валерьевич Тарасов.txt
 176,Игра на нервах,Денис Деев,4.4,116,3.9,8,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Игра на нервах - Денис Деев.txt
-177,Я - другой!,"Денис Деев,4","3""",54,3.5,6,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Я - другой! - Денис Деев.txt
+177,Я - другой!,"Денис Деев,4.3,54,3.5,6,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Я - другой! - Денис Деев.txt
 178,Свободные Миры. Книга 4. Падение Змея, Анатолий Натанович Арсеньев,4.2,50,4.0,2,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Свободные Миры. Книга 4. Падение Змея - Анатолий Натанович Арсеньев.txt
 179,Геймер. Реал vs вирт, Виталий Егоренков,4.1,66,3.0,28,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Геймер. Реал vs вирт - Виталий Егоренков.txt
 180,Игра Хаоса. Книга пятая, Алексей Свадковский,4.4,110,4.1,66,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Игра Хаоса. Книга пятая - Алексей Свадковский.txt
@@ -374,7 +374,7 @@ index,title,author,litres mark,litres votes,livelib mark,livelib votes,path
 372,Шаг в бездну, Константин Николаевич Муравьев,4.3,109,3.9,57,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Шаг в бездну - Константин Николаевич Муравьев.txt
 373,Путь к трону. Шаг первый, Александр А,4.5,42,3.1,11,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Путь к трону. Шаг первый - Александр А. Зайцев.txt
 374,Том Джоу, Владимир Ильин,4.3,128,3.8,24,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Том Джоу - Владимир Ильин.txt
-375,Гражданин Преисподней. Дисбат, Юрий Брайдер & Николай Чадович,4.6,27 084,4.6,17 815,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Гражданин Преисподней. Дисбат - Юрий Брайдер & Николай Чадович.txt
+375,Гражданин Преисподней. Дисбат, Юрий Брайдер & Николай Чадович,4.6,27084,4.6,17815,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Гражданин Преисподней. Дисбат - Юрий Брайдер & Николай Чадович.txt
 376,ГоТМ. Книга 2, Вячеслав Васильев & Денис Росс,4.4, 8,None,None,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/ГоТМ. Книга 2 - Вячеслав Васильев & Денис Росс.txt
 377,КвазаРазмерность. Книга 1, Виталий Вавикин,4.5,58,4.5,4764,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/КвазаРазмерность. Книга 1 - Виталий Вавикин.txt
 378,Проклятие Первого Десмода, Андрей Вичурин,5.0,2,None,None,/Users/apotekhin/repositories/literary-predictor/src/corpus txt/Проклятие Первого Десмода - Андрей Вичурин.txt
