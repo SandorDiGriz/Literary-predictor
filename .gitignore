@@ -18,3 +18,6 @@ src/rating-predictor/catboost_info/time_left.tsv
 src/rating-predictor/catboost_info/learn_error.tsv
 src/rating-predictor/catboost_info/learn/events.out.tfevents
 src/rating-predictor/1
+src/rating-predictor/catboost_info/test/events.out.tfevents
+.gitignore
+src/rating-predictor/catboost_info/test_error.tsv

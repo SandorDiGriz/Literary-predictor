@@ -11,7 +11,6 @@ import numpy as np
 import re
 import math
 import random
-import csv
 
 
 class Extractor:
