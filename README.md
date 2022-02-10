@@ -16,17 +16,17 @@ There are four steps to execute:
 
 
 ## Corpus
-- Literature was taken mostly from Moshkov Library and other sources with books in the public domain.
+Literature was taken mostly from Moshkov Library and other sources with books in the public domain.
 
 ## Rating parser
- - “LitRes” parser is designed, literary ratings from “LitRes” and “LiveLib” are scraped.
+“LitRes” parser is designed, literary ratings from “LitRes” and “LiveLib” are scraped.
  
  ## Features extraction
-- Extractor is designed. Various TTR, readability score and others parameters were gain.
+Extractor is designed. Various TTR, readability score and others parameters were gain.
 
 
 ## Prediction 
-- RandomForest, CatBoost, Logistic and Linear regression, KNeighbors models were compared. Since R^2 for the regression problem often took a negative value, it was decided to move on to the classification problem. The papers were divided according to the median of their grades into two classes – "successful" and "unsuccessful". The results of the predictions are presented below.
+RandomForest, CatBoost, Logistic and Linear regression, KNeighbors models were compared. Since R^2 for the regression problem often took a negative value, it was decided to move on to the classification problem. The papers were divided according to the median of their grades into two classes – "successful" and "unsuccessful". The results of the predictions are presented below.
 
 | Model                     | ROC AUC score|
 | -----------               | -----------  |
