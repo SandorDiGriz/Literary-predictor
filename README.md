@@ -7,7 +7,7 @@ This project is the implementation of my coursework on the topic: *Predicting th
 
 Recently, finding a correlation between the structural features of the text and its reception has become a more and more widespread task of computational linguistics. However, the interrelation of the reader's perception of a literary work suffers from the ambiguity of many textual parameters by ones it is possible to establish a dependence with a user assessment. Concerning Russian-language literature, such a process is complicated by the lack of representative databases of user reviews and rather noticeable discrepancies with the methods of text data analysis. In this paper, I propose a task of investigating the possibility of predicting the rating of a text only by its lexical and syntactic features.
 
-There are four steps to execute:
+There are five steps to execute:
 - Collect data and build a corpus
 - Parse LitRes to scrape text's evaluation
 - Extract lexical and syntactic features
