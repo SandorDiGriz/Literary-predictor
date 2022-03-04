@@ -269,7 +269,7 @@ class Extractor:
         Parameters
         ----------
             text (str or List[str]): input text
-            method (str, optional): FRE or FKD(L). Defaults to "fre".
+            method (str, optional): FRE or FKG(L). Defaults to "fre".
 
         Raises
         ------
@@ -286,11 +286,11 @@ class Extractor:
         sentences = len(nltk.sent_tokenize("".join(text)))
         if method == "fre":
             return 206.835 - 1.3 * (words / sentences) - 60.1 * (syllables / words)
-        elif method == "fkd":
+        elif method == "fkg":
             return (0.5 * words / sentences) + (8.4 * syllables / words) - 15.59
         else:
             raise ValueError(
-                f"Current method is '{method}' but should be in ('fre', 'fkd')"
+                f"Current method is '{method}' but should be in ('fre', 'fkg')"
             )
 
     def readability_score_soloviev(self, text, method="fre"):
@@ -301,7 +301,7 @@ class Extractor:
         Parameters
         ----------
             text (str or List[str]): input text
-            method (str, optional): FRE or FKD(L). Defaults to "fre".
+            method (str, optional): FRE or FKG(L). Defaults to "fre".
 
         Raises
         ------
@@ -318,11 +318,11 @@ class Extractor:
         sentences = len(nltk.sent_tokenize("".join(text)))
         if method == "fre":
             return 208.7 - 2.6 * (words / sentences) - 39.2 * (syllables / words)
-        elif method == "fkd":
+        elif method == "fkg":
             return (0.36 * words / sentences) + (5.76 * syllables / words) - 11.97
         else:
             raise ValueError(
-                f"Current method is '{method}' but should be in ('fre', 'fkd')"
+                f"Current method is '{method}' but should be in ('fre', 'fkg')"
             )
 
     def extract_all(self, text: str or List[str], cut_edge=False) -> dict:
@@ -350,9 +350,9 @@ class Extractor:
             "TTR-corrected": self.ttr(text, "corrected"),
             "TTR-hdd": self.ttr(text, "hdd"),
             "TTR-mtld": self.ttr(text, "mtld"),
-            "FKD-oborneva": self.readability_score_oborneva(text, "fkd"),
+            "FKG-oborneva": self.readability_score_oborneva(text, "fkg"),
             "FRE-oborneva": self.readability_score_oborneva(text, "fre"),
-            "FKD-soloviev": self.readability_score_soloviev(text, "fkd"),
+            "FKG-soloviev": self.readability_score_soloviev(text, "fkg"),
             "FRE-soloviev": self.readability_score_soloviev(text, "fre"),
         }
 
